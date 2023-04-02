@@ -29,7 +29,7 @@ def on_message(client, userdata, msg):
         elif msg.payload.decode("utf-8") == "decorate":
             output = functions.switchtoggle(config.get("Devices", "tuyaid_decorate"), config.get("Devices", "ip_decorate"), config.get("Devices", "key_decorate"))
         elif msg.payload.decode("utf-8") == "alllights":
-            output = functions.hass_toggle(config.get("Devices", "hassid_alllights"))
+            output = functions.hass_toggle(config.get("Devices", "hassid_lights"))
         elif msg.payload.decode("utf-8") == "climate":
             output = functions.hass_climate_toggle(config.get("Devices", "hassid_climate"))
         elif msg.payload.decode("utf-8") == "fan":
