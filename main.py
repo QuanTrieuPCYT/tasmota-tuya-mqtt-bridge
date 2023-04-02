@@ -25,9 +25,9 @@ def on_message(client, userdata, msg):
         if msg.payload.decode("utf-8") == "rgb":
             output = functions.rgbtoggle(config.get("Devices", "tuyaid_rgb"), config.get("Devices", "ip_rgb"), config.get("Devices", "key_rgb"))
         elif msg.payload.decode("utf-8") == "desk":
-            output = functions.switchtoggle(config.get("Devices", "tuyaid_desk"), config.get("Devices", "tuyaid_desk"), config.get("Devices", "tuyaid_desk"))
+            output = functions.switchtoggle(config.get("Devices", "tuyaid_desk"), config.get("Devices", "ip_desk"), config.get("Devices", "key_desk"))
         elif msg.payload.decode("utf-8") == "decorate":
-            output = functions.switchtoggle(config.get("Devices", "tuyaid_decorate"), config.get("Devices", "tuyaid_decorate"), config.get("Devices", "tuyaid_decorate"))
+            output = functions.switchtoggle(config.get("Devices", "tuyaid_decorate"), config.get("Devices", "ip_decorate"), config.get("Devices", "key_decorate"))
         elif msg.payload.decode("utf-8") == "alllights":
             output = functions.hass_toggle(config.get("Devices", "hassid_alllights"))
         elif msg.payload.decode("utf-8") == "climate":
