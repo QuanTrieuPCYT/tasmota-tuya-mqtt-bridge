@@ -1,0 +1,27 @@
+[Authorization]
+Address =
+Port =
+User =
+Password =
+HomeAssistantToken =
+BaseURL =
+
+[Configuration]
+Topic = custommqtt/devices/control
+
+[Devices]
+tuyaid_rgb =
+ip_rgb =
+key_rgb =
+
+tuyaid_desk =
+ip_desk =
+key_desk =
+
+tuyaid_decorate =
+ip_decorate =
+key_decorate =
+
+hassid_fan =
+hassid_climate =
+hassid_lights =
