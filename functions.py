@@ -5,7 +5,13 @@ import configparser
 
 config = configparser.ConfigParser()
 config.read('config.conf')
-headers = {'Authorization': 'Bearer ' + config.get("Authorization", "HomeAssistantToken")}
+
+
+def conf(bs1, bs2):
+    return config.get(bs1, bs2)
+
+
+headers = {'Authorization': 'Bearer ' + conf("Authorization", "HomeAssistantToken")}
 
 
 # I modified these to return the status of the device after toggling it
@@ -35,12 +41,12 @@ def switchtoggle(id, ip, key):
 
 
 def hass_toggle(entity):
-    url = f'{config.get("Authorization", "BaseURL").rstrip("/")}/api/services/homeassistant/toggle'
+    url = f'{conf("Authorization", "BaseURL").rstrip("/")}/api/services/homeassistant/toggle'
     data = {
         'entity_id': entity
     }
     requests.post(url, headers=headers, json=data)
-    urlstate = f'{config.get("Authorization", "BaseURL").rstrip("/")}/api/states/{entity}'
+    urlstate = f'{conf("Authorization", "BaseURL").rstrip("/")}/api/states/{entity}'
     responsestate = requests.get(urlstate, headers=headers)
     return responsestate.text
 
@@ -49,17 +55,17 @@ def hass_fan_toggle(entity):
     payload = json.dumps({
         "entity_id": f"{entity}",
     })
-    response = requests.get(f'{config.get("Authorization", "BaseURL").rstrip("/")}/api/states/{entity}',
+    response = requests.get(f'{conf("Authorization", "BaseURL").rstrip("/")}/api/states/{entity}',
                             headers=headers)
     # If the fan is currently on, send a turn_off command
     if response.json()["state"] == "on":
-        requests.post(config.get("Authorization", "BaseURL").rstrip("/") + "/api/services/fan/turn_off",
+        requests.post(conf("Authorization", "BaseURL").rstrip("/") + "/api/services/fan/turn_off",
                       headers=headers, data=payload)
     # If the fan is currently off, send a turn_on command
     else:
-        requests.post(config.get("Authorization", "BaseURL").rstrip("/") + "/api/services/fan/turn_on",
+        requests.post(conf("Authorization", "BaseURL").rstrip("/") + "/api/services/fan/turn_on",
                       headers=headers, data=payload)
-    return requests.get(f'{config.get("Authorization", "BaseURL").rstrip("/")}/api/states/{entity}',
+    return requests.get(f'{conf("Authorization", "BaseURL").rstrip("/")}/api/states/{entity}',
                         headers=headers).text
 
 
@@ -67,16 +73,16 @@ def hass_climate_toggle(entity):
     payload = json.dumps({
         "entity_id": f"{entity}",
     })
-    response = requests.get(f'{config.get("Authorization", "BaseURL").rstrip("/")}/api/states/{entity}',
+    response = requests.get(f'{conf("Authorization", "BaseURL").rstrip("/")}/api/states/{entity}',
                             headers=headers)
     # If the climate is currently off, send a turn_on command
     if response.json()["state"] == "off":
-        requests.post(config.get("Authorization", "BaseURL").rstrip("/") + "/api/services/climate/turn_on",
+        requests.post(conf("Authorization", "BaseURL").rstrip("/") + "/api/services/climate/turn_on",
                       headers=headers, data=payload)
     # If the climate is currently on (its state will not be 'on', instead it will be one of the modes, then send a
     # turn_off command)
     else:
-        requests.post(config.get("Authorization", "BaseURL").rstrip("/") + "/api/services/climate/turn_off",
+        requests.post(conf("Authorization", "BaseURL").rstrip("/") + "/api/services/climate/turn_off",
                       headers=headers, data=payload)
-    return requests.get(f'{config.get("Authorization", "BaseURL").rstrip("/")}/api/states/{entity}',
+    return requests.get(f'{conf("Authorization", "BaseURL").rstrip("/")}/api/states/{entity}',
                         headers=headers).text

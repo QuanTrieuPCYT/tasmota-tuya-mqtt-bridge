@@ -1,17 +1,14 @@
-import configparser
 import paho.mqtt.client as mqtt
 import functions
-
-config = configparser.ConfigParser()
-config.read('config.conf')
+from functions import conf
 
 
 # Define MQTT client parameters
-mqtt_broker = config.get("Authorization", "Address")
-mqtt_port = int(config.get("Authorization", "Port"))
-mqtt_topic = config.get("Configuration", "Topic")
-mqtt_username = config.get("Authorization", "User")
-mqtt_password = config.get("Authorization", "Password")
+mqtt_broker = conf("Authorization", "Address")
+mqtt_port = int(conf("Authorization", "Port"))
+mqtt_topic = conf("Configuration", "Topic")
+mqtt_username = conf("Authorization", "User")
+mqtt_password = conf("Authorization", "Password")
 
 
 # Define MQTT client callbacks
@@ -23,17 +20,17 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     if msg.topic == mqtt_topic:
         if msg.payload.decode("utf-8") == "rgb":
-            output = functions.rgbtoggle(config.get("Devices", "tuyaid_rgb"), config.get("Devices", "ip_rgb"), config.get("Devices", "key_rgb"))
+            output = functions.rgbtoggle(conf("Devices", "tuyaid_rgb"), conf("Devices", "ip_rgb"), conf("Devices", "key_rgb"))
         elif msg.payload.decode("utf-8") == "desk":
-            output = functions.switchtoggle(config.get("Devices", "tuyaid_desk"), config.get("Devices", "ip_desk"), config.get("Devices", "key_desk"))
+            output = functions.switchtoggle(conf("Devices", "tuyaid_desk"), conf("Devices", "ip_desk"), conf("Devices", "key_desk"))
         elif msg.payload.decode("utf-8") == "decorate":
-            output = functions.switchtoggle(config.get("Devices", "tuyaid_decorate"), config.get("Devices", "ip_decorate"), config.get("Devices", "key_decorate"))
+            output = functions.switchtoggle(conf("Devices", "tuyaid_decorate"), conf("Devices", "ip_decorate"), conf("Devices", "key_decorate"))
         elif msg.payload.decode("utf-8") == "alllights":
-            output = functions.hass_toggle(config.get("Devices", "hassid_lights"))
+            output = functions.hass_toggle(conf("Devices", "hassid_lights"))
         elif msg.payload.decode("utf-8") == "climate":
-            output = functions.hass_climate_toggle(config.get("Devices", "hassid_climate"))
+            output = functions.hass_climate_toggle(conf("Devices", "hassid_climate"))
         elif msg.payload.decode("utf-8") == "fan":
-            output = functions.hass_fan_toggle(config.get("Devices", "hassid_fan"))
+            output = functions.hass_fan_toggle(conf("Devices", "hassid_fan"))
         else:
             output = "You requested an invalid device."
         print(f"Output:\n{output}")
