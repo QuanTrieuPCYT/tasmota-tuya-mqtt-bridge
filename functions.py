@@ -39,6 +39,15 @@ def switchtoggle(id, ip, key):
         d.turn_on()
     return data
 
+def switchtoggle4(id, ip, key):
+    d = tinytuya.OutletDevice(id, ip, key)
+    d.set_version(3.4)
+    data = d.status()
+    if data['dps']['1']:
+        d.turn_off()
+    else:
+        d.turn_on()
+    return data
 
 def hass_toggle(entity):
     url = f'{conf("Authorization", "BaseURL").rstrip("/")}/api/services/homeassistant/toggle'

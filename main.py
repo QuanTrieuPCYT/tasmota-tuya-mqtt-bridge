@@ -24,7 +24,7 @@ def on_message(client, userdata, msg):
         elif msg.payload.decode("utf-8") == "desk":
             output = functions.switchtoggle(conf("Devices", "tuyaid_desk"), conf("Devices", "ip_desk"), conf("Devices", "key_desk"))
         elif msg.payload.decode("utf-8") == "decorate":
-            output = functions.switchtoggle(conf("Devices", "tuyaid_decorate"), conf("Devices", "ip_decorate"), conf("Devices", "key_decorate"))
+            output = functions.switchtoggle4(conf("Devices", "tuyaid_decorate"), conf("Devices", "ip_decorate"), conf("Devices", "key_decorate"))
         elif msg.payload.decode("utf-8") == "alllights":
             output = functions.hass_toggle(conf("Devices", "hassid_lights"))
         elif msg.payload.decode("utf-8") == "climate":

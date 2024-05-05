@@ -186,3 +186,6 @@ fabric.properties
 
 # config.conf, we prefer config.conf.example
 config.conf
+
+# devices.json
+devices.json
