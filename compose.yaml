@@ -1,0 +1,9 @@
+services:
+  tasmqtt:
+    image: ghcr.io/quantrieupcyt/tasmota-tuya-mqtt-bridge:main
+    container_name: tasmqttt
+    hostname: cutie-tasmqtt
+    volumes:
+      - './tasmqtt-config/config.conf:/tasmota-tuya-mqtt-bridge/config.conf'
+    network_mode: host
+    restart: on-failure
