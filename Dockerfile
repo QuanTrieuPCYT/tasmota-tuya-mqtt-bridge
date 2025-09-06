@@ -4,4 +4,4 @@ COPY . .
 RUN adduser -D tasmqtt
 USER tasmqtt
 RUN pip3.13 install -r ./requirements.txt
-CMD ["python3.13", "./main.py"]1
+CMD ["python3.13", "./main.py"]
