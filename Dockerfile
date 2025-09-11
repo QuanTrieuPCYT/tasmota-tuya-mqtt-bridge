@@ -1,7 +1,7 @@
 FROM python:3.13-alpine AS builder
 WORKDIR /builder
 COPY requirements.txt .
-RUN pip3.13 -r ./requirements.txt
+RUN pip3.13 install -r ./requirements.txt
 
 FROM python:3.13-alpine
 WORKDIR /tasmota-tuya-mqtt-bridge
