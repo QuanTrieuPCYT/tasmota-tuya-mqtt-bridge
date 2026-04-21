@@ -3,6 +3,8 @@ import requests
 import tinytuya
 import configparser
 
+from miio import Yeelight, DeviceException
+
 config = configparser.ConfigParser()
 config.read('config.conf')
 
@@ -14,11 +16,8 @@ def conf(bs1, bs2):
 headers = {'Authorization': 'Bearer ' + conf("Authorization", "HomeAssistantToken")}
 
 
-# I modified these to return the status of the device after toggling it
-# Nothing serious, right?
-
-
-def rgbtoggle(id, ip, key):
+# Tuya methods
+def tuya_rgbtoggle(id, ip, key):
     d = tinytuya.BulbDevice(id, ip, key)
     d.set_version(3.3)
     data = d.status()
@@ -29,9 +28,12 @@ def rgbtoggle(id, ip, key):
     return data
 
 
-def switchtoggle(id, ip, key):
+def tuya_switchtoggle(id, ip, key, isnewversion=False):
     d = tinytuya.OutletDevice(id, ip, key)
-    d.set_version(3.3)
+    if isnewversion:
+        d.set_version(3.4)
+    else:
+        d.set_version(3.3)
     data = d.status()
     if data['dps']['1']:
         d.turn_off()
@@ -39,15 +41,15 @@ def switchtoggle(id, ip, key):
         d.turn_on()
     return data
 
-def switchtoggle4(id, ip, key):
-    d = tinytuya.OutletDevice(id, ip, key)
-    d.set_version(3.4)
-    data = d.status()
-    if data['dps']['1']:
-        d.turn_off()
-    else:
-        d.turn_on()
-    return data
+
+# miot methods
+def miot_toggle(ip, token):
+    try:
+        bulb = Yeelight(ip, token)
+        bulb.toggle()
+        return bulb.get_properties()
+    except Exception as e:
+        return e
 
 def hass_toggle(entity):
     url = f'{conf("Authorization", "BaseURL").rstrip("/")}/api/services/homeassistant/toggle'

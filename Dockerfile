@@ -1,7 +1,8 @@
 FROM python:3.14-alpine AS builder
 WORKDIR /builder
 COPY requirements.txt .
-RUN pip3.14 install -r ./requirements.txt
+RUN apk add --no-cache gcc musl-dev linux-headers
+RUN CFLAGS="-Wno-error=int-conversion" pip3.14 install -r ./requirements.txt
 
 FROM python:3.14-alpine
 WORKDIR /tasmota-tuya-mqtt-bridge

@@ -14,13 +14,12 @@ tuyaid_rgb =
 ip_rgb =
 key_rgb =
 
-tuyaid_desk =
-ip_desk =
-key_desk =
-
 tuyaid_decorate =
 ip_decorate =
 key_decorate =
+
+ip_desk =
+miio_token_desk =
 
 hassid_fan =
 hassid_climate =
