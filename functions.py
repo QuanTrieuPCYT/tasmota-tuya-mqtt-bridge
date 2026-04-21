@@ -45,9 +45,7 @@ def tuya_switchtoggle(id, ip, key, isnewversion=False):
 # miot methods
 def miot_toggle(ip, token):
     try:
-        bulb = Yeelight(ip, token)
-        bulb.toggle()
-        return bulb.get_properties()
+        return Yeelight(ip, token).toggle()
     except Exception as e:
         return e
 
