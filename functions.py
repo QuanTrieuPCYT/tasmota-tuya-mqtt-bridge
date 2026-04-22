@@ -17,28 +17,44 @@ headers = {'Authorization': 'Bearer ' + conf("Authorization", "HomeAssistantToke
 
 
 # Tuya methods
-def tuya_rgbtoggle(id, ip, key):
+def tuya_rgbtoggle(id, ip, key, dpids):
+    dpid_list = [int(x.strip()) for x in dpids.split(',')]
     d = tinytuya.BulbDevice(id, ip, key)
     d.set_version(3.3)
     data = d.status()
-    if data['dps']['20']:
-        d.turn_off()
-    else:
-        d.turn_on()
+    if not (data and 'dps' in data):
+        d.updatedps(index=dpid_list)
+        d = tinytuya.BulbDevice(id, ip, key)
+        d.set_version(3.3)
+        data = d.status()
+
+    if data and 'dps' in data and '20' in data['dps']:
+        if data['dps']['20']:
+            d.turn_off()
+        else:
+            d.turn_on()
+
     return data
 
 
-def tuya_switchtoggle(id, ip, key, isnewversion=False):
+def tuya_switchtoggle(id, ip, key, dpids, isnewversion=False):
+    dpid_list = [int(x.strip()) for x in dpids.split(',')]
+    version = 3.4 if isnewversion else 3.3
     d = tinytuya.OutletDevice(id, ip, key)
-    if isnewversion:
-        d.set_version(3.4)
-    else:
-        d.set_version(3.3)
+    d.set_version(version)
     data = d.status()
-    if data['dps']['1']:
-        d.turn_off()
-    else:
-        d.turn_on()
+    if not (data and 'dps' in data):
+        d.updatedps(index=dpid_list)
+        d = tinytuya.OutletDevice(id, ip, key)
+        d.set_version(version)
+        data = d.status()
+
+    if data and 'dps' in data and '1' in data['dps']:
+        if data['dps']['1']:
+            d.turn_off()
+        else:
+            d.turn_on()
+
     return data
 
 
