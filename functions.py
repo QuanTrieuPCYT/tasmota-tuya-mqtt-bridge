@@ -35,7 +35,7 @@ def tuya_rgbtoggle(id, ip, key, dpids):
         else:
             d.turn_on()
 
-    return data
+    return d.status()
 
 
 def tuya_switchtoggle(id, ip, key, dpids, isnewversion=False):
@@ -57,7 +57,7 @@ def tuya_switchtoggle(id, ip, key, dpids, isnewversion=False):
         else:
             d.turn_on()
 
-    return data
+    return d.status()
 
 
 # miot methods
