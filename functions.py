@@ -44,8 +44,8 @@ def tuya_switchtoggle(id, ip, key, dpids, isnewversion=False):
     d = tinytuya.OutletDevice(id, ip, key)
     d.set_version(version)
     data = d.status()
-    if not (data and 'dps' in data):
-        print("Device doesn't seem to respond, sending DPIDs...")
+    if not data or 'dps' not in data or '1' not in data['dps']:
+        print("Device doesn't seem to have toggle DPID or not responding, sending DPIDs...")
         d.updatedps(index=dpid_list)
         d = tinytuya.OutletDevice(id, ip, key)
         d.set_version(version)
