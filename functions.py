@@ -23,6 +23,7 @@ def tuya_rgbtoggle(id, ip, key, dpids):
     d.set_version(3.3)
     data = d.status()
     if not (data and 'dps' in data):
+        print("Device doesn't seem to respond, sending DPIDs...")
         d.updatedps(index=dpid_list)
         d = tinytuya.BulbDevice(id, ip, key)
         d.set_version(3.3)
@@ -44,6 +45,7 @@ def tuya_switchtoggle(id, ip, key, dpids, isnewversion=False):
     d.set_version(version)
     data = d.status()
     if not (data and 'dps' in data):
+        print("Device doesn't seem to respond, sending DPIDs...")
         d.updatedps(index=dpid_list)
         d = tinytuya.OutletDevice(id, ip, key)
         d.set_version(version)
@@ -64,6 +66,7 @@ def miot_toggle(ip, token):
         return Yeelight(ip, token).toggle()
     except Exception as e:
         return e
+
 
 def hass_toggle(entity):
     url = f'{conf("Authorization", "BaseURL").rstrip("/")}/api/services/homeassistant/toggle'
