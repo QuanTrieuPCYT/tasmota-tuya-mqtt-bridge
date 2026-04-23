@@ -1,15 +1,15 @@
+import configparser
 import json
+
 import requests
 import tinytuya
-import configparser
-
-from miio import Yeelight, DeviceException
+from miio import Yeelight
 
 config = configparser.ConfigParser()
 config.read('config.conf')
 
 
-def conf(bs1, bs2):
+def conf(bs1: str, bs2: str):
     return config.get(bs1, bs2)
 
 
@@ -17,58 +17,55 @@ headers = {'Authorization': 'Bearer ' + conf("Authorization", "HomeAssistantToke
 
 
 # Tuya methods
-def tuya_rgbtoggle(id, ip, key, dpids):
+def tuya_rgbtoggle(deviceid: str, ip: str, key: str, dpids: str):
     dpid_list = [int(x.strip()) for x in dpids.split(',')]
-    d = tinytuya.BulbDevice(id, ip, key)
+
+    # initialize a device on the first pass to send initial DPIDs
+    d = tinytuya.BulbDevice(deviceid, ip, key)
     d.set_version(3.3)
-    data = d.status()
-    if not (data and 'dps' in data):
-        print("Device doesn't seem to respond, sending DPIDs...")
-        d.updatedps(index=dpid_list)
-        d = tinytuya.BulbDevice(id, ip, key)
-        d.set_version(3.3)
-        data = d.status()
+    d.updatedps(index=dpid_list)
+    del d
 
-    if data and 'dps' in data and '20' in data['dps']:
-        if data['dps']['20']:
-            d.turn_off()
-        else:
-            d.turn_on()
-
-    return d.status()
+    # after sending DPIDs, a device might not be usable until reinitialization
+    d = tinytuya.BulbDevice(deviceid, ip, key)
+    d.set_version(3.3)
+    if d.status()['dps']['20']:
+        d.turn_off()
+    else:
+        d.turn_on()
+    return d.status()  # this time send the updated status
 
 
-def tuya_switchtoggle(id, ip, key, dpids, isnewversion=False):
-    dpid_list = [int(x.strip()) for x in dpids.split(',')]
+def tuya_switchtoggle(deviceid: str, ip: str, key: str, dpids: str, isnewversion: bool = False):
     version = 3.4 if isnewversion else 3.3
-    d = tinytuya.OutletDevice(id, ip, key)
+    dpid_list = [int(x.strip()) for x in dpids.split(',')]
+
+    # initialize a device on the first pass to send initial DPIDs
+    d = tinytuya.OutletDevice(deviceid, ip, key)
     d.set_version(version)
-    data = d.status()
-    if not data or 'dps' not in data or '1' not in data['dps']:
-        print("Device doesn't seem to have toggle DPID or not responding, sending DPIDs...")
-        d.updatedps(index=dpid_list)
-        d = tinytuya.OutletDevice(id, ip, key)
-        d.set_version(version)
-        data = d.status()
+    d.updatedps(index=dpid_list)
+    del d
 
-    if data and 'dps' in data and '1' in data['dps']:
-        if data['dps']['1']:
-            d.turn_off()
-        else:
-            d.turn_on()
-
-    return d.status()
+    # after sending DPIDs, a device might not be usable until reinitialization
+    d = tinytuya.OutletDevice(deviceid, ip, key)
+    d.set_version(version)
+    if d.status()['dps']['1']:
+        d.turn_off()
+    else:
+        d.turn_on()
+    return d.status()  # this time send the updated status
 
 
 # miot methods
-def miot_toggle(ip, token):
+def miot_toggle(ip: str, token: str):
     try:
         return Yeelight(ip, token).toggle()
     except Exception as e:
         return e
 
 
-def hass_toggle(entity):
+# Home Assistant methods
+def hass_toggle(entity: str):
     url = f'{conf("Authorization", "BaseURL").rstrip("/")}/api/services/homeassistant/toggle'
     data = {
         'entity_id': entity
@@ -79,7 +76,7 @@ def hass_toggle(entity):
     return responsestate.text
 
 
-def hass_fan_toggle(entity):
+def hass_fan_toggle(entity: str):
     payload = json.dumps({
         "entity_id": f"{entity}",
     })
@@ -97,7 +94,7 @@ def hass_fan_toggle(entity):
                         headers=headers).text
 
 
-def hass_climate_toggle(entity):
+def hass_climate_toggle(entity: str):
     payload = json.dumps({
         "entity_id": f"{entity}",
     })
