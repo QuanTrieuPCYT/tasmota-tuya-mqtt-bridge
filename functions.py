@@ -23,7 +23,7 @@ def tuya_rgbtoggle(deviceid: str, ip: str, key: str, dpids: str):
     # initialize a device on the first pass to send initial DPIDs
     d = tinytuya.BulbDevice(deviceid, ip, key)
     d.set_version(3.3)
-    d.updatedps(index=dpid_list)
+    print(f"DPID Send Status: {d.updatedps(index=dpid_list)}")
     del d
 
     # after sending DPIDs, a device might not be usable until reinitialization
@@ -43,7 +43,7 @@ def tuya_switchtoggle(deviceid: str, ip: str, key: str, dpids: str, isnewversion
     # initialize a device on the first pass to send initial DPIDs
     d = tinytuya.OutletDevice(deviceid, ip, key)
     d.set_version(version)
-    d.updatedps(index=dpid_list)
+    print(f"DPID Send Status: {d.updatedps(index=dpid_list)}")
     del d
 
     # after sending DPIDs, a device might not be usable until reinitialization
