@@ -1,4 +1,4 @@
 aioesphomeapi
-paho.mqtt
+paho.mqtt==2.1.0
 python-miio
 requests
