@@ -1,4 +1,4 @@
-paho.mqtt==2.1.0
+aioesphomeapi
+paho.mqtt
 python-miio
-tinytuya
 requests

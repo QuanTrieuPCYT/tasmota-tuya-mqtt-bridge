@@ -10,15 +10,13 @@ BaseURL =
 Topic = custommqtt/devices/control
 
 [Devices]
-tuyaid_rgb =
 ip_rgb =
 key_rgb =
-dpids_rgb =
+devname_rgb =
 
-tuyaid_decorate =
 ip_decorate =
 key_decorate =
-dpids_decorate =
+devname_decorate =
 
 ip_desk =
 miio_token_desk =

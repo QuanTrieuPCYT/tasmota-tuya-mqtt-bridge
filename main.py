@@ -22,11 +22,11 @@ def on_connect(client, userdata, flags, reason_code, properties):
 def on_message(client, userdata, msg):
     if msg.topic == mqtt_topic:
         if msg.payload.decode("utf-8") == "rgb":
-            output = functions.tuya_rgbtoggle(conf("Devices", "tuyaid_rgb"), conf("Devices", "ip_rgb"), conf("Devices", "key_rgb"), conf("Devices", "dpids_rgb"))
+            output = functions.esphome_toggle(conf("Devices", "ip_rgb"), conf("Devices", "key_rgb"), conf("Devices", "devname_rgb"))
         elif msg.payload.decode("utf-8") == "desk":
             output = functions.miot_toggle(conf("Devices", "ip_desk"), conf("Devices", "miio_token_desk"))
         elif msg.payload.decode("utf-8") == "decorate":
-            output = functions.tuya_switchtoggle(conf("Devices", "tuyaid_decorate"), conf("Devices", "ip_decorate"), conf("Devices", "key_decorate"), conf("Devices", "dpids_decorate"), True)
+            output = functions.esphome_toggle(conf("Devices", "ip_decorate"), conf("Devices", "key_decorate"), conf("Devices", "devname_decorate"))
         elif msg.payload.decode("utf-8") == "alllights":
             output = functions.hass_toggle(conf("Devices", "hassid_lights"))
         elif msg.payload.decode("utf-8") == "climate":

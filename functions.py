@@ -1,8 +1,9 @@
+import asyncio
 import configparser
 import json
 
+import aioesphomeapi
 import requests
-import tinytuya
 from miio import Yeelight
 
 config = configparser.ConfigParser()
@@ -16,44 +17,64 @@ def conf(bs1: str, bs2: str):
 headers = {'Authorization': 'Bearer ' + conf("Authorization", "HomeAssistantToken")}
 
 
-# Tuya methods
-def tuya_rgbtoggle(deviceid: str, ip: str, key: str, dpids: str):
-    dpid_list = [int(x.strip()) for x in dpids.split(',')]
+# ESPHome methods
+def esphome_toggle(ip: str, key: str, device_name: str):
+    async def _toggle_task():
+        client = aioesphomeapi.APIClient(
+            address=ip,
+            port=6053,
+            password="",
+            noise_psk=key
+        )
 
-    # initialize a device on the first pass to send initial DPIDs
-    d = tinytuya.BulbDevice(deviceid, ip, key)
-    d.set_version(3.3)
-    print(f"DPID Send Status: {d.updatedps(index=dpid_list)}")
-    del d
+        await client.connect(login=True)
 
-    # after sending DPIDs, a device might not be usable until reinitialization
-    d = tinytuya.BulbDevice(deviceid, ip, key)
-    d.set_version(3.3)
-    if d.status()['dps']['20']:
-        d.turn_off()
-    else:
-        d.turn_on()
-    return d.status()  # this time send the updated status
+        try:
+            entities_services = await client.list_entities_services()
+            entities = entities_services[0] if isinstance(entities_services, tuple) else entities_services
 
+            target_light = None
+            for entity in entities:
+                if isinstance(entity, aioesphomeapi.LightInfo) and (
+                        entity.name == device_name or entity.object_id == device_name
+                ):
+                    target_light = entity
+                    break
 
-def tuya_switchtoggle(deviceid: str, ip: str, key: str, dpids: str, isnewversion: bool = False):
-    version = 3.4 if isnewversion else 3.3
-    dpid_list = [int(x.strip()) for x in dpids.split(',')]
+            if not target_light:
+                return {"error": f"Light '{device_name}' not found on {ip}"}
 
-    # initialize a device on the first pass to send initial DPIDs
-    d = tinytuya.OutletDevice(deviceid, ip, key)
-    d.set_version(version)
-    print(f"DPID Send Status: {d.updatedps(index=dpid_list)}")
-    del d
+            current_state = None
+            state_event = asyncio.Event()
 
-    # after sending DPIDs, a device might not be usable until reinitialization
-    d = tinytuya.OutletDevice(deviceid, ip, key)
-    d.set_version(version)
-    if d.status()['dps']['1']:
-        d.turn_off()
-    else:
-        d.turn_on()
-    return d.status()  # this time send the updated status
+            def state_callback(state):
+                nonlocal current_state
+                if state.key == target_light.key:
+                    current_state = state
+                    state_event.set()
+
+            unsubscribe = client.subscribe_states(state_callback)
+
+            try:
+                await asyncio.wait_for(state_event.wait(), timeout=3.0)
+            except asyncio.TimeoutError:
+                return {"error": "Timeout waiting for current device state"}
+            finally:
+                if callable(unsubscribe):
+                    unsubscribe()
+
+            new_state = not current_state.state
+            client.light_command(key=target_light.key, state=new_state)
+
+            return {
+                "device": target_light.name,
+                "state": "on" if new_state else "off"
+            }
+
+        finally:
+            await client.disconnect()
+
+    return asyncio.run(_toggle_task())
 
 
 # miot methods
