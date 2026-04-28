@@ -1,8 +1,8 @@
-import asyncio
+#import asyncio
 import configparser
 import json
 
-import aioesphomeapi
+#import aioesphomeapi
 import requests
 from miio import Yeelight
 
@@ -18,6 +18,7 @@ headers = {'Authorization': 'Bearer ' + conf("Authorization", "HomeAssistantToke
 
 
 # ESPHome methods
+"""
 def esphome_toggle(ip: str, key: str, device_name: str):
     async def _toggle_task():
         client = aioesphomeapi.APIClient(
@@ -75,6 +76,7 @@ def esphome_toggle(ip: str, key: str, device_name: str):
             await client.disconnect()
 
     return asyncio.run(_toggle_task())
+"""
 
 
 # miot methods
